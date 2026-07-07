@@ -187,6 +187,12 @@ progress {
   margin-right: 4px;
 }
 
+.result + .btn-ui {
+  margin: 0 auto;
+  display: block;
+  float: none;
+}
+
 .highscore {
   font-size: 1.8rem;
   text-align: center;

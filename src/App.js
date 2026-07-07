@@ -17,6 +17,16 @@ const initialState = {
     points:0,
 }
 
+function resetState(state) {
+    return {
+        ...state,
+        status: "Ready",
+        index: 0,
+        answer: null,
+        points: 0,
+    };
+}
+
 function reducer(state, action) {
     switch(action.type) {
         case "dataReceived":
@@ -40,7 +50,8 @@ function reducer(state, action) {
                             answer: action.payload,
                             points: action.payload === question.correctOption ? state.points + question.points : state.points,
                         }
-                         case "nextQuestion":
+                         case
+                          "nextQuestion":
                          return {
                              ...state, index:state.index +1 , answer:null,
                          }
@@ -48,6 +59,8 @@ function reducer(state, action) {
                             return {
                                 ...state, status:"Finished"
                             }
+                    case "restart":
+                            return resetState(state);
             default:
                 throw new Error("Action unKnown")
     }
@@ -79,7 +92,7 @@ function App(){
              <NextButton dispatch={dispatch} answer={answer} index={index} numQuestions={numquestions} />
             </>
 )}
-        {status==="Finished" && <FinishScreen points={points} maxPoints={maxPoints}/>} 
+        {status==="Finished" && <FinishScreen points={points} maxPoints={maxPoints} onRestart={() => dispatch({type: "restart"})}/>} 
     </Main>
  </div>
 }
