@@ -8,13 +8,18 @@ import Question from "./Question";
 import NextButton from "./NextButton";
 import Progress from "./Progress";
 import FinishScreen from "./FinshScreen";
+import Footer from "./footer";
+import Timer from "./Timer";
 
+const sec = 30
 const initialState = {
     questions:[],
     status: "loading",
     index:0,
     answer:null,
     points:0,
+    secondsRemaining :null
+
 }
 
 function resetState(state) {
@@ -24,6 +29,7 @@ function resetState(state) {
         index: 0,
         answer: null,
         points: 0,
+        secondsRemaining:10
     };
 }
 
@@ -41,7 +47,7 @@ function reducer(state, action) {
                 };
                 case "start":
                     return {
-                        ...state , status:"Active"
+                        ...state , status:"Active" , secondsRemaining: state.questions.length *sec
                     }
                     case "newAnswer":
                         const question = state.questions.at(state.index);
@@ -61,6 +67,17 @@ function reducer(state, action) {
                             }
                     case "restart":
                             return resetState(state);
+                   case "tick":
+                        if (state.secondsRemaining === 0) {
+                            return {
+                                ...state,
+                                status: "Finished"
+                            }
+                        }
+                        return {
+                            ...state,
+                            secondsRemaining: state.secondsRemaining - 1
+                        }      
             default:
                 throw new Error("Action unKnown")
     }
@@ -68,7 +85,7 @@ function reducer(state, action) {
 
 function App(){
 
-    const [{questions , status , index , answer , points} , dispatch] = useReducer(reducer ,  initialState) ;
+    const [{questions , status , index , answer , points , secondsRemaining} , dispatch] = useReducer(reducer ,  initialState) ;
     const numquestions= questions.length;
     const maxPoints = questions.reduce((prev , cur)=> prev + cur.points , 0);
 
@@ -89,7 +106,10 @@ function App(){
             <>
             <Progress index={index} numQuestion={numquestions} maxPoints={maxPoints} points={points} answer={answer}/>
             <Question question={questions[index]} dispatch={dispatch} answer={answer}/>
+            <Footer>
+              <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />  
              <NextButton dispatch={dispatch} answer={answer} index={index} numQuestions={numquestions} />
+            </Footer>
             </>
 )}
         {status==="Finished" && <FinishScreen points={points} maxPoints={maxPoints} onRestart={() => dispatch({type: "restart"})}/>} 
